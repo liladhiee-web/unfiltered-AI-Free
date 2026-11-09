@@ -5,16 +5,20 @@ pydantic>=2.6.0
 httpx>=0.27.0
 aiofiles>=23.2.1
 
+# CUDA 12 Runtime & CuBLAS Libraries (Resolves libcudart.so.12 / libcublas.so.12)
+nvidia-cuda-runtime-cu12>=12.1.105
+nvidia-cublas-cu12>=12.1.3.1
+
 # Hugging Face Model Hub & High-Speed Downloads
-huggingface-hub[hf_transfer]>=0.24.0
+huggingface-hub>=0.24.0
+hf-transfer>=0.1.6
+
+# Client testing & utility
+openai>=1.20.0
+requests>=2.31.0
 
 # Optional PyTorch & Transformers backend dependencies
 torch>=2.2.0
 transformers>=4.48.0
 accelerate>=0.27.0
 bitsandbytes>=0.42.0
-
-# Client testing & utility
-openai>=1.20.0
-requests>=2.31.0
-

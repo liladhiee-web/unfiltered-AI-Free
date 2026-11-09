@@ -14,6 +14,27 @@ echo " API Key    : $API_KEY"
 echo " Main Port  : $PORT"
 echo "=================================================================="
 
+# 0. Ensure CUDA 12 library paths are in LD_LIBRARY_PATH
+python3 -c "
+import os, glob, site
+
+dirs = []
+for p in ['/usr/local/cuda/lib64', '/usr/local/cuda-12/lib64', '/usr/local/cuda-*/lib64']:
+    for m in glob.glob(p):
+        if os.path.isdir(m) and m not in dirs: dirs.append(m)
+
+for sp in site.getsitepackages():
+    for sub in ['nvidia/cuda_runtime/lib', 'nvidia/cublas/lib']:
+        d = os.path.join(sp, sub)
+        if os.path.isdir(d) and d not in dirs: dirs.append(d)
+
+print(':'.join(dirs))
+" > /tmp/cuda_ld_dirs.txt
+
+CUDA_EXTRA_LD=$(cat /tmp/cuda_ld_dirs.txt)
+export LD_LIBRARY_PATH="${CUDA_EXTRA_LD}:${LD_LIBRARY_PATH}"
+echo "[*] Configured LD_LIBRARY_PATH for CUDA execution."
+
 # 1. Start CUDA inference engine in background (all 99 layers offloaded to GPU)
 echo "[*] Launching high-speed CUDA backend on port $BACKEND_PORT..."
 python3 -m llama_cpp.server \
@@ -54,4 +75,3 @@ echo "[✓] Keep-Alive daemon started with PID: $KEEPALIVE_PID"
 # 4. Start Cloudflare Tunnel and display public URL
 echo "[*] Establishing Cloudflare Secure Tunnel..."
 python3 tunnel.py --port $PORT --api-key "$API_KEY"
-

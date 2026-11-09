@@ -228,6 +228,8 @@ Kaggle allows up to **12 hours per session**. To prevent interruptions:
 
 | Issue | Cause | Solution |
 | :--- | :--- | :--- |
+| `libcudart.so.12: cannot open shared object file` | Missing CUDA 12 runtime in dynamic linker search path | Step 3 now automatically installs `nvidia-cuda-runtime-cu12` and runs `ldconfig` with `/etc/ld.so.conf.d/cuda_custom.conf`. |
+| `ConnectionRefusedError: [Errno 111]` | Backend failed to start before calling API | Re-run Step 3 and Step 5. Step 5 now has an automated fallback to the standalone prebuilt `llama-server` binary. |
 | `HTTP 401 Unauthorized` | Missing or mismatched API key | Pass `Authorization: Bearer <API_KEY>` or enter key in top right of Web UI. |
 | Tunnel URL not showing | Internet disabled in Kaggle settings | Turn **Internet: ON** in right sidebar and restart kernel. |
 | Slow generation (< 5 tok/s) | CPU mode active / GPU layers not offloaded | Ensure accelerator is **GPU T4 x 2** and `--n_gpu_layers 99` is set. |

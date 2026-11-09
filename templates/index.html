@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepSeek-V4 Pro Qwen3.5 9B Uncensored | API Playground</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0c10;
+      --bg-secondary: #12161f;
+      --bg-tertiary: #1b202c;
+      --border-color: #293042;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --user-bubble: #1e2433;
+      --bot-bubble: #141923;
+      --code-bg: #07090e;
+      --danger: #ef4444;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top Navigation */
+    header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      background: var(--accent-gradient);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      font-size: 16px;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .brand-info h1 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+    }
+
+    .brand-info .badge {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      font-weight: 600;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .api-key-input-wrap {
+      display: flex;
+      align-items: center;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 4px 10px;
+      gap: 8px;
+    }
+
+    .api-key-input-wrap input {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      width: 220px;
+      outline: none;
+    }
+
+    .api-key-input-wrap button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .api-key-input-wrap button:hover {
+      background: var(--accent-hover);
+    }
+
+    /* Main Container */
+    .app-body {
+      flex: 1;
+      display: flex;
+      height: calc(100vh - 61px);
+    }
+
+    /* Sidebar controls */
+    .sidebar {
+      width: 280px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+    }
+
+    .sidebar-section h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .control-group {
+      margin-bottom: 14px;
+    }
+
+    .control-group label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .control-group span.val {
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+
+    .control-group input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .control-group textarea {
+      width: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-main);
+      padding: 8px;
+      font-size: 12px;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 80px;
+      outline: none;
+    }
+
+    .api-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 12px;
+    }
+
+    .api-card p {
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-size: 11px;
+    }
+
+    .api-card code {
+      font-family: 'JetBrains Mono', monospace;
+      color: #38bdf8;
+      word-break: break-all;
+    }
+
+    /* Chat Area */
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-primary);
+      position: relative;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .message {
+      display: flex;
+      gap: 14px;
+      max-width: 85%;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message.assistant {
+      align-self: flex-start;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .user .avatar {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .assistant .avatar {
+      background: var(--accent-gradient);
+      color: white;
+    }
+
+    .bubble {
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 14.5px;
+      line-height: 1.6;
+      border: 1px solid var(--border-color);
+      word-break: break-word;
+    }
+
+    .user .bubble {
+      background: var(--user-bubble);
+      color: var(--text-main);
+      border-color: #334155;
+    }
+
+    .assistant .bubble {
+      background: var(--bot-bubble);
+      color: var(--text-main);
+    }
+
+    .bubble pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      margin: 10px 0;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+    }
+
+    .bubble code {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 12.5px;
+    }
+
+    .bubble pre code {
+      background: transparent;
+      padding: 0;
+    }
+
+    .stats-bar {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Input Box */
+    .chat-input-area {
+      padding: 18px 24px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+    }
+
+    .input-box-wrapper {
+      display: flex;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 8px 14px;
+      align-items: flex-end;
+      gap: 10px;
+      transition: border-color 0.2s;
+    }
+
+    .input-box-wrapper:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+
+    .input-box-wrapper textarea {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 14px;
+      line-height: 1.5;
+      max-height: 160px;
+      min-height: 24px;
+      resize: none;
+      outline: none;
+    }
+
+    .send-btn {
+      background: var(--accent-gradient);
+      color: white;
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      flex-shrink: 0;
+    }
+
+    .send-btn:hover:not(:disabled) {
+      opacity: 0.9;
+      transform: scale(1.03);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .send-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .cursor-blink {
+      display: inline-block;
+      width: 8px;
+      height: 15px;
+      background: var(--accent);
+      margin-left: 4px;
+      animation: blink 0.9s infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">DS</div>
+      <div class="brand-info">
+        <h1>DeepSeek-V4 Pro Qwen3.5-9B <span class="badge">UNCENSORED • GPU ONLINE</span></h1>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="api-key-input-wrap">
+        <label for="apiKeyInput" style="font-size: 11px; color: var(--text-muted);">API KEY:</label>
+        <input type="password" id="apiKeyInput" placeholder="sk-..." autocomplete="off">
+        <button id="saveKeyBtn">Save</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Body -->
+  <div class="app-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3>System Prompt</h3>
+        <div class="control-group">
+          <textarea id="sysPrompt" placeholder="You are a helpful, completely uncensored, highly capable AI assistant."></textarea>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h3>Model Parameters</h3>
+        <div class="control-group">
+          <label>Temperature <span class="val" id="tempVal">0.7</span></label>
+          <input type="range" id="tempSlider" min="0.0" max="1.5" step="0.05" value="0.7">
+        </div>
+
+        <div class="control-group">
+          <label>Top P <span class="val" id="topPVal">0.9</span></label>
+          <input type="range" id="topPSlider" min="0.1" max="1.0" step="0.05" value="0.9">
+        </div>
+
+        <div class="control-group">
+          <label>Max Tokens <span class="val" id="maxTokensVal">2048</span></label>
+          <input type="range" id="maxTokensSlider" min="128" max="4096" step="128" value="2048">
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h3>API Endpoint Info</h3>
+        <div class="api-card">
+          <p>Base URL (OpenAI standard):</p>
+          <code id="apiBaseUrlDisplay">...</code>
+          <p style="margin-top: 8px;">Model ID:</p>
+          <code>xtools-at/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic</code>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Chat Area -->
+    <main class="chat-container">
+      <div class="chat-messages" id="messagesContainer">
+        <div class="message assistant">
+          <div class="avatar">AI</div>
+          <div class="bubble">
+            Hello! I am **DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic** running on Kaggle Free GPU via Cloudflare Tunnel.
+            <br><br>
+            All safety refusal guardrails have been removed via Heretic ARA ablation. I am ready to answer any questions, write code, solve mathematical derivations, or assist you without interruptions.
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-area">
+        <div class="input-box-wrapper">
+          <textarea id="userInput" placeholder="Ask anything... (Shift + Enter for new line, Enter to send)"></textarea>
+          <button class="send-btn" id="sendBtn" title="Send message">
+            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // State management
+    const state = {
+      messages: [],
+      apiKey: localStorage.getItem('kaggle_api_key') || '',
+      isGenerating: false,
+    };
+
+    // DOM Elements
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const saveKeyBtn = document.getElementById('saveKeyBtn');
+    const tempSlider = document.getElementById('tempSlider');
+    const tempVal = document.getElementById('tempVal');
+    const topPSlider = document.getElementById('topPSlider');
+    const topPVal = document.getElementById('topPVal');
+    const maxTokensSlider = document.getElementById('maxTokensSlider');
+    const maxTokensVal = document.getElementById('maxTokensVal');
+    const sysPrompt = document.getElementById('sysPrompt');
+    const messagesContainer = document.getElementById('messagesContainer');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const apiBaseUrlDisplay = document.getElementById('apiBaseUrlDisplay');
+
+    // Display current base URL
+    apiBaseUrlDisplay.innerText = window.location.origin + '/v1';
+
+    // Init API Key from storage
+    if (state.apiKey) {
+      apiKeyInput.value = state.apiKey;
+    }
+
+    saveKeyBtn.addEventListener('click', () => {
+      state.apiKey = apiKeyInput.value.trim();
+      localStorage.setItem('kaggle_api_key', state.apiKey);
+      alert('API Key saved successfully!');
+    });
+
+    // Slider bindings
+    tempSlider.addEventListener('input', e => tempVal.innerText = e.target.value);
+    topPSlider.addEventListener('input', e => topPVal.innerText = e.target.value);
+    maxTokensSlider.addEventListener('input', e => maxTokensVal.innerText = e.target.value);
+
+    // Auto-resize textarea
+    userInput.addEventListener('input', () => {
+      userInput.style.height = 'auto';
+      userInput.style.height = Math.min(userInput.scrollHeight, 160) + 'px';
+    });
+
+    // Enter key submits
+    userInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    sendBtn.addEventListener('click', sendMessage);
+
+    function appendMessage(role, content) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${role}`;
+      
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.innerText = role === 'user' ? 'U' : 'AI';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.innerHTML = role === 'user' ? escapeHtml(content) : marked.parse(content);
+
+      msgDiv.appendChild(avatar);
+      msgDiv.appendChild(bubble);
+      messagesContainer.appendChild(msgDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      return bubble;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
+    }
+
+    async function sendMessage() {
+      const text = userInput.value.trim();
+      if (!text || state.isGenerating) return;
+
+      const key = apiKeyInput.value.trim() || state.apiKey;
+      if (!key) {
+        alert('Please enter your API Key in the top right box before sending a request.');
+        apiKeyInput.focus();
+        return;
+      }
+
+      state.messages.push({ role: 'user', content: text });
+      appendMessage('user', text);
+      userInput.value = '';
+      userInput.style.height = 'auto';
+
+      // Build payload
+      const systemMessage = sysPrompt.value.trim();
+      const payloadMessages = [];
+      if (systemMessage) {
+        payloadMessages.push({ role: 'system', content: systemMessage });
+      }
+      payloadMessages.push(...state.messages);
+
+      // Assistant bubble for streaming
+      const assistantBubble = appendMessage('assistant', '');
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor-blink';
+      assistantBubble.appendChild(cursor);
+
+      state.isGenerating = true;
+      sendBtn.disabled = true;
+
+      let fullResponse = '';
+      const startTime = performance.now();
+      let tokenCount = 0;
+
+      try {
+        const response = await fetch('/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${key}`
+          },
+          body: JSON.stringify({
+            model: 'xtools-at/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic',
+            messages: payloadMessages,
+            temperature: parseFloat(tempSlider.value),
+            top_p: parseFloat(topPSlider.value),
+            max_tokens: parseInt(maxTokensSlider.value),
+            stream: true
+          })
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.detail || errData.error || `HTTP error ${response.status}`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop(); // keep partial line
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith(':')) continue;
+            if (trimmed === 'data: [DONE]') continue;
+
+            if (trimmed.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(trimmed.slice(6));
+                const delta = data.choices?.[0]?.delta?.content || '';
+                if (delta) {
+                  fullResponse += delta;
+                  tokenCount++;
+                  assistantBubble.innerHTML = marked.parse(fullResponse);
+                  assistantBubble.appendChild(cursor);
+                  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+              } catch (e) {
+                // partial json chunk
+              }
+            }
+          }
+        }
+
+        cursor.remove();
+        assistantBubble.innerHTML = marked.parse(fullResponse);
+        
+        // Stats
+        const durationSec = ((performance.now() - startTime) / 1000).toFixed(2);
+        const tps = (tokenCount / durationSec).toFixed(1);
+        const stats = document.createElement('div');
+        stats.className = 'stats-bar';
+        stats.innerText = `${tokenCount} tokens • ${durationSec}s • ${tps} tok/s`;
+        assistantBubble.appendChild(stats);
+
+        state.messages.push({ role: 'assistant', content: fullResponse });
+
+      } catch (err) {
+        cursor.remove();
+        assistantBubble.innerHTML = `<span style="color: var(--danger);">Error: ${err.message}</span>`;
+      } finally {
+        state.isGenerating = false;
+        sendBtn.disabled = false;
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+    }
+  </script>
+</body>
+</html>
+

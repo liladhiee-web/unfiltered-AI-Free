@@ -1,0 +1,20 @@
+# Fast API & Web Server
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+pydantic>=2.6.0
+httpx>=0.27.0
+aiofiles>=23.2.1
+
+# Hugging Face Model Hub & High-Speed Downloads
+huggingface-hub[hf_transfer]>=0.24.0
+
+# Optional PyTorch & Transformers backend dependencies
+torch>=2.2.0
+transformers>=4.48.0
+accelerate>=0.27.0
+bitsandbytes>=0.42.0
+
+# Client testing & utility
+openai>=1.20.0
+requests>=2.31.0
+
